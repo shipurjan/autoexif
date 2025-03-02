@@ -28,8 +28,8 @@ npm install
 # Build the project
 npm run build
 
-# Optional: Install globally
-npm install -g .
+# Optional: Link to use as a standalone CLI command
+npm link
 ```
 
 ## Usage
