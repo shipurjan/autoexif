@@ -1,25 +1,33 @@
 # autoexif
 
-A command-line tool for removing excess EXIF data from images while preserving technical metadata. This utility helps maintain privacy by stripping identifying information from your photos while keeping useful technical details.
+A specialized command-line utility that declutters EXIF metadata in digital images by preserving only the essential technical parameters while removing extraneous information about camera equipment, software, and other non-essential details.
 
 ## Overview
 
-Digital photos often contain extensive embedded metadata, including camera information, editing software details, and even location data or photographer information. This data can compromise privacy when sharing images online.
+Digital photographs typically contain extensive embedded metadata (EXIF data) that includes numerous parameters, many of which are irrelevant to the actual photographic qualities of the image. This metadata often contains camera and lens model information that can introduce bias when evaluating image quality.
 
-Autoexif selectively preserves only technical metadata (exposure settings, focal length, etc.) while removing identifying information (camera model, serial numbers, editing software, copyright, etc.).
+Autoexif creates a clean copy of your original image with only essential technical metadata intact—preserving information valuable for understanding the photographic conditions while eliminating equipment-specific details and other extraneous information that clutters the metadata profile.
+
+## Key Features
+
+- Creates a non-destructive workflow by always generating a separate output file, never modifying the original
+- Completely removes all embedded metadata from the image copy
+- Selectively restores only specific technical metadata elements that directly relate to the photographic parameters
+- Eliminates equipment-specific information that could introduce bias when evaluating image quality
+- Offers flexible output options, with automatic generation of output filenames if not specified
 
 ## Installation
 
 ### Prerequisites
 
-- Node.js 16.x or higher
-- npm or yarn
+- Node.js 18 or higher
+- npm
 
 ### Installation Steps
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/autoexif.git
+git clone https://github.com/shipurjan/autoexif.git
 cd autoexif
 
 # Install dependencies
@@ -27,9 +35,6 @@ npm install
 
 # Build the project
 npm run build
-
-# Optional: Link to use as a standalone CLI command
-npm link
 ```
 
 ## Usage
@@ -58,7 +63,7 @@ If no output path is specified, the program will create a new file in the same d
 
 ## Preserved Metadata
 
-Autoexif preserves only non-identifying technical metadata, including:
+Autoexif preserves a carefully curated set of non-identifying technical information, including:
 
 ### Exposure Information
 
@@ -87,6 +92,17 @@ Autoexif preserves only non-identifying technical metadata, including:
 - Light source and value
 - Flash information
 
+## Use Cases
+
+Autoexif is particularly valuable for:
+
+- Photographers sharing work for technical feedback without equipment bias influencing the critique
+- Photography educators focusing discussions on exposure, composition, and technique rather than gear
+- Photography forums where equipment discussions can detract from image quality conversations
+- Creating cleaner, more focused image metadata profiles for archiving
+- Removing extraneous editing software information and revision history while keeping essential parameters
+- Sharing images with reduced metadata clutter (with privacy improvement as a secondary benefit)
+
 ## Examples
 
 ### Basic Example
@@ -105,22 +121,11 @@ autoexif -i family-photo.jpg -o family-photo-clean.jpg
 
 Processes `family-photo.jpg` and saves the cleaned version as `family-photo-clean.jpg`.
 
-## Why Use Autoexif?
+## Implementation
 
-- **Privacy Protection**: Remove identifying information before sharing photos
-- **Metadata Cleanup**: Clean unnecessary metadata while preserving technical details
-- **Selective Preservation**: Keep only the metadata that matters for technical understanding
+The tool leverages the robust ExifTool library (via exiftool-vendored) to handle the complex metadata structures found in modern image files. The process follows a methodical approach of copying, clearing, and selectively restoring specific metadata elements to ensure consistent results across different image formats and sources.
 
-## Technical Details
-
-Autoexif uses [exiftool-vendored](https://github.com/photostructure/exiftool-vendored.js), a Node.js wrapper for ExifTool, to provide efficient and reliable metadata processing.
-
-The workflow:
-
-1. Creates a copy of the original file
-2. Reads all existing metadata
-3. Removes all metadata from the copy
-4. Writes back only the selected technical metadata
+By focusing exclusively on the technical parameters that matter for photographic analysis, autoexif provides a streamlined approach that preserves valuable image context while removing equipment-specific information that can introduce bias or unnecessary clutter in the metadata profile.
 
 ## License
 

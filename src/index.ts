@@ -1,21 +1,22 @@
 #!/usr/bin/env node
 import { Command } from "commander";
-import { version } from "~/package.json";
+import { name, description, version } from "~/package.json";
 import { autoexif } from "@/programs/autoexif";
 
 const program = new Command();
 
 program
-  .name("autoexif")
-  .description("Automatically remove excess EXIF data from a file")
+  .name(name)
+  .summary(description)
+  .description("A utility that creates copies of images with decluttered metadata, preserving only essential technical information like exposure settings while removing equipment-specific details that might introduce bias. This tool streamlines image metadata to focus on parameters that directly relate to the photographic qualities, implementing a non-destructive workflow that never modifies original files.")
   .version(version)
   .requiredOption(
     "-i, --input <path>",
-    "Input file path to the file with EXIF data that should be removed",
+    "path to file containing EXIF data for removal",
   )
   .option(
     "-o, --output <path>",
-    "Output file path to save the file with removed EXIF data",
+    "destination path for saving file with EXIF data removed",
   )
   .action(autoexif);
 
