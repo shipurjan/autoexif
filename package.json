@@ -4,7 +4,7 @@
   "description": "CLI tool for removing excess EXIF data from images",
   "main": "dist/index.js",
   "bin": {
-    "convollm": "./dist/index.js"
+    "autoexif": "./dist/index.js"
   },
   "scripts": {
     "dev": "tsup src/index.ts --watch",
