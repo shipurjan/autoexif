@@ -81,7 +81,7 @@ async function validatePaths(
   try {
     await access(inputPath);
   } catch {
-    console.error(
+    process.stderr.write(
       `Error: Input file '${inputPath}' does not exist or is not accessible.`,
     );
     return null;
@@ -95,7 +95,7 @@ async function validatePaths(
       );
 
   if (inputPath === outputPath) {
-    console.error(
+    process.stderr.write(
       "Error: Input and output paths cannot be the same to avoid modifying the original file.",
     );
     return null;
@@ -133,7 +133,6 @@ export async function autoexif({ input, output }: IOptions): Promise<void> {
 
     const { inputPath, outputPath } = paths;
     hasRunExifTool = true;
-    console.log(`Processing ${inputPath} -> ${outputPath}`);
 
     const allTags = await exiftool.read(inputPath);
     await copyFile(inputPath, outputPath);
@@ -145,9 +144,11 @@ export async function autoexif({ input, output }: IOptions): Promise<void> {
       await exiftool.write(outputPath, tagsToWrite);
     }
 
-    console.log(`Successfully processed '${inputPath}' -> '${outputPath}'`);
+    process.stdout.write(outputPath);
   } catch (error) {
-    console.error("Error processing file:", error);
+    process.stderr.write(
+      `Error processing file: ${JSON.stringify(error, null, 2)}`,
+    );
   } finally {
     if (hasRunExifTool) {
       await exiftool.end();
