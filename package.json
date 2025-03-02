@@ -1,0 +1,37 @@
+{
+  "name": "autoexif",
+  "version": "0.0.1",
+  "description": "CLI tool for removing excess EXIF data from images",
+  "main": "dist/index.js",
+  "bin": {
+    "convollm": "./dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsup src/index.ts --watch",
+    "build": "tsup src/index.ts --format cjs --dts",
+    "start": "node dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "exif",
+    "data",
+    "remove",
+    "automatic"
+  ],
+  "author": "Cyprian Zdebski <shipurjan@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "22.13.5",
+    "prettier": "3.5.2",
+    "tsup": "8.4.0",
+    "typescript": "5.7.3"
+  },
+  "dependencies": {
+    "commander": "13.1.0",
+    "exiftool-vendored": "29.1.0"
+  }
+}
