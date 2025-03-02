@@ -26,15 +26,7 @@ Autoexif creates a clean copy of your original image with only essential technic
 ### Installation Steps
 
 ```bash
-# Clone the repository
-git clone https://github.com/shipurjan/autoexif.git
-cd autoexif
-
-# Install dependencies
-npm install
-
-# Build the project
-npm run build
+npm i -g autoexif
 ```
 
 ## Usage
