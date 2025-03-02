@@ -19,10 +19,26 @@
   "keywords": [
     "exif",
     "data",
+    "simple",
+    "image",
+    "photo",
+    "metadata",
+    "exiftool",
+    "cli",
     "remove",
+    "auto",
     "automatic"
   ],
   "author": "Cyprian Zdebski <shipurjan@gmail.com>",
+  "homepage": "https://github.com/shipurjan/autoexif#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shipurjan/autoexif.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shipurjan/autoexif/issues",
+    "email": "shipurjan@gmail.com"
+  },
   "license": "MIT",
   "devDependencies": {
     "@types/node": "22.13.5",
