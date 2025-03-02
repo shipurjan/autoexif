@@ -1,6 +1,6 @@
 {
   "name": "autoexif",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CLI tool for removing excess EXIF data from images",
   "main": "dist/index.js",
   "bin": {
