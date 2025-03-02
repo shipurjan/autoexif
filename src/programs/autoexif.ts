@@ -1,6 +1,6 @@
 import { exiftool, Tags, WriteTags } from "exiftool-vendored";
 import { resolve, join, dirname, extname, basename } from "node:path";
-import { access, copyFile } from "node:fs/promises";
+import { access, copyFile, unlink } from "node:fs/promises";
 
 interface IOptions {
   input: string;
@@ -78,14 +78,7 @@ async function validatePaths(
 ): Promise<{ inputPath: string; outputPath: string } | null> {
   const inputPath = resolve(input);
 
-  try {
-    await access(inputPath);
-  } catch {
-    process.stderr.write(
-      `Error: Input file '${inputPath}' does not exist or is not accessible.`,
-    );
-    return null;
-  }
+  await access(inputPath);
 
   const outputPath = output
     ? resolve(output)
@@ -95,10 +88,9 @@ async function validatePaths(
       );
 
   if (inputPath === outputPath) {
-    process.stderr.write(
+    throw new Error(
       "Error: Input and output paths cannot be the same to avoid modifying the original file.",
     );
-    return null;
   }
 
   return { inputPath, outputPath };
@@ -125,33 +117,27 @@ function extractPreservedTags(allTags: Tags): Record<string, any> {
  * Processes an image file by preserving only technical EXIF data
  */
 export async function autoexif({ input, output }: IOptions): Promise<void> {
-  let hasRunExifTool = false;
-
   try {
     const paths = await validatePaths(input, output);
     if (!paths) return;
 
     const { inputPath, outputPath } = paths;
-    hasRunExifTool = true;
-
     const allTags = await exiftool.read(inputPath);
     await copyFile(inputPath, outputPath);
 
-    const tagsToWrite = extractPreservedTags(allTags);
-    await exiftool.write(outputPath, { all: null } as WriteTags);
+    try {
+      const tagsToWrite = extractPreservedTags(allTags);
+      await exiftool.write(outputPath, { all: null } as WriteTags);
 
-    if (Object.keys(tagsToWrite).length > 0) {
-      await exiftool.write(outputPath, tagsToWrite);
+      if (Object.keys(tagsToWrite).length)
+        await exiftool.write(outputPath, tagsToWrite);
+    } catch (error) {
+      await unlink(outputPath);
+      throw error;
     }
 
-    process.stdout.write(outputPath);
-  } catch (error) {
-    process.stderr.write(
-      `Error processing file: ${JSON.stringify(error, null, 2)}`,
-    );
+    console.log(outputPath);
   } finally {
-    if (hasRunExifTool) {
-      await exiftool.end();
-    }
+    exiftool.end();
   }
 }
