@@ -1,6 +1,6 @@
 import { exiftool, Tags, WriteTags } from "exiftool-vendored";
-import path from "node:path";
-import fs from "node:fs/promises";
+import { resolve, join, dirname, extname, basename } from "node:path";
+import { access, copyFile } from "node:fs/promises";
 
 interface IOptions {
   input: string;
@@ -76,10 +76,10 @@ async function validatePaths(
   input: string,
   output?: string,
 ): Promise<{ inputPath: string; outputPath: string } | null> {
-  const inputPath = path.resolve(input);
+  const inputPath = resolve(input);
 
   try {
-    await fs.access(inputPath);
+    await access(inputPath);
   } catch {
     console.error(
       `Error: Input file '${inputPath}' does not exist or is not accessible.`,
@@ -88,10 +88,10 @@ async function validatePaths(
   }
 
   const outputPath = output
-    ? path.resolve(output)
-    : path.join(
-        path.dirname(inputPath),
-        `${path.basename(inputPath, path.extname(inputPath))}.out${path.extname(inputPath)}`,
+    ? resolve(output)
+    : join(
+        dirname(inputPath),
+        `${basename(inputPath, extname(inputPath))}.out${extname(inputPath)}`,
       );
 
   if (inputPath === outputPath) {
@@ -136,7 +136,7 @@ export async function autoexif({ input, output }: IOptions): Promise<void> {
     console.log(`Processing ${inputPath} -> ${outputPath}`);
 
     const allTags = await exiftool.read(inputPath);
-    await fs.copyFile(inputPath, outputPath);
+    await copyFile(inputPath, outputPath);
 
     const tagsToWrite = extractPreservedTags(allTags);
     await exiftool.write(outputPath, { all: null } as WriteTags);
