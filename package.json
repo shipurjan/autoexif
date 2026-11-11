@@ -41,13 +41,16 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "22.13.5",
-    "prettier": "3.5.2",
-    "tsup": "8.4.0",
-    "typescript": "5.7.3"
+    "@types/node": "24",
+    "prettier": "3.10.0",
+    "tsup": "9.0.0",
+    "typescript": "6.0.3"
   },
   "dependencies": {
-    "commander": "13.1.0",
-    "exiftool-vendored": "29.1.0"
+    "commander": "15.1.0",
+    "exiftool-vendored": "39.2.0"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }
