@@ -65,7 +65,7 @@ function extractPreservedTags(allTags: Tags): Record<string, any> {
     "ShutterSpeedValue",
     "ApertureValue",
     "BrightnessValue",
-    "ExposureCompensationMode",
+    "ExposureCompensation",
     "Flash",
     "FocalLength",
     "ColorSpace",
