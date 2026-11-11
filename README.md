@@ -48,6 +48,8 @@ autoexif -i path/to/image.jpg -o path/to/output.jpg
 
 - `-i, --input <path>` - Path to the input image file (required)
 - `-o, --output <path>` - Path for the output file (optional)
+- `--no-date` - Also remove the capture date and time
+- `--no-copyright` - Also remove author and copyright information
 - `--version` - Display the version number
 - `--help` - Show help information
 
@@ -73,28 +75,45 @@ Autoexif preserves a carefully curated set of non-identifying technical informat
 
 - Exposure time, aperture (F-number), ISO
 - Exposure program, mode, and compensation
-- Metering mode
-- Brightness, shutter speed values
+- Metering mode, gain control, exposure index
+- Brightness, shutter speed and aperture values
+- Flash information
 
 ### Optical Information
 
 - Focal length (including 35mm equivalent)
-- Field of view, circle of confusion
-- Hyperfocal distance
 - Digital zoom ratio
+- Subject distance and distance range
+
+Derived values such as field of view, circle of confusion, hyperfocal distance and light value aren't stored separately, but tools like ExifTool still calculate them from the preserved tags.
 
 ### Image Properties
 
-- Color space, temperature, white balance
+- Color space and embedded ICC color profile (so wide-gamut images keep their correct colors)
+- White balance and light source
 - Contrast, saturation, and sharpness settings
-- Image dimensions and resolution
-- Orientation
+- Resolution and orientation
 
 ### Scene Information
 
 - Scene type and capture mode
-- Light source and value
-- Flash information
+- Composite image indicator (e.g. HDR or night-mode captures)
+
+### Capture Date (disable with `--no-date`)
+
+- Original capture date and time, including time zone offset and sub-seconds
+
+### Authorship and Copyright (disable with `--no-copyright`)
+
+- Artist and copyright notice (EXIF), creator and rights (XMP), by-line and copyright notice (IPTC)
+
+### Always Removed
+
+- Camera and lens make, model and serial numbers
+- GPS location
+- Editing software, edit history and modification dates
+- Manufacturer-specific maker notes
+- Thumbnails, descriptions, keywords and any other metadata not listed above
 
 ## Use Cases
 
@@ -127,7 +146,7 @@ Processes `family-photo.jpg` and saves the cleaned version as `family-photo-clea
 
 ## Implementation
 
-The tool leverages the robust ExifTool library (via exiftool-vendored) to handle the complex metadata structures found in modern image files. The process follows a methodical approach of copying, clearing, and selectively restoring specific metadata elements to ensure consistent results across different image formats and sources.
+The tool leverages the robust ExifTool library (via exiftool-vendored) to handle the complex metadata structures found in modern image files. It copies the original image, then makes a single ExifTool call on the copy that clears all metadata and copies back only the preserved tags from the original file (`-all= -tagsFromFile @ ...`). Values are copied exactly as stored and stay in their original metadata groups, and the image data itself is never re-encoded.
 
 By focusing exclusively on the technical parameters that matter for photographic analysis, autoexif provides a streamlined approach that preserves valuable image context while removing equipment-specific information that can introduce bias or unnecessary clutter in the metadata profile.
 
