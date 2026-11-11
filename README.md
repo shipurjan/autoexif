@@ -20,7 +20,7 @@ Autoexif creates a clean copy of your original image with only essential technic
 
 ### Prerequisites
 
-- Node.js 18 or higher
+- Node.js 24 or higher
 - npm
 
 ### Installation Steps
@@ -52,6 +52,18 @@ autoexif -i path/to/image.jpg -o path/to/output.jpg
 - `--help` - Show help information
 
 If no output path is specified, the program will create a new file in the same directory as the input file with `.out` inserted before the extension (e.g., `image.jpg` becomes `image.out.jpg`).
+
+### Output
+
+On success, autoexif prints only the absolute path of the created file to stdout, so it can be used in scripts and pipelines:
+
+```bash
+# Open the cleaned copy right away
+xdg-open "$(autoexif -i photo.jpg)"
+
+# Process every JPEG in a directory
+for f in *.jpg; do autoexif -i "$f"; done
+```
 
 ## Preserved Metadata
 
