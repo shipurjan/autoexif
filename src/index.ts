@@ -20,6 +20,10 @@ program
     "-o, --output <path>",
     "destination path for saving file with EXIF data removed",
   )
+  .option(
+    "-t, --tags-from <path>",
+    "read metadata from this file instead of the input (e.g. the original a converted image was made from)",
+  )
   .option("--no-date", "remove capture date and time")
   .option("--no-copyright", "remove author and copyright information")
   .action(autoexif);

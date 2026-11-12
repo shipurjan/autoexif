@@ -48,6 +48,7 @@ autoexif -i path/to/image.jpg -o path/to/output.jpg
 
 - `-i, --input <path>` - Path to the input image file (required)
 - `-o, --output <path>` - Path for the output file (optional)
+- `-t, --tags-from <path>` - Read metadata from this file instead of the input (see [Restoring Metadata After Conversion](#restoring-metadata-after-conversion))
 - `--no-date` - Also remove the capture date and time
 - `--no-copyright` - Also remove author and copyright information
 - `--version` - Display the version number
@@ -143,6 +144,18 @@ autoexif -i family-photo.jpg -o family-photo-clean.jpg
 ```
 
 Processes `family-photo.jpg` and saves the cleaned version as `family-photo-clean.jpg`.
+
+### Restoring Metadata After Conversion
+
+Image converters often lose metadata. For example, ImageMagick drops all EXIF when converting a TIFF to JPEG. Use `--tags-from` to take the metadata from the original file and the pixels from the converted one:
+
+```bash
+magick photo.tif -resize 2048x2048 -quality 90 photo.tmp.jpg
+autoexif -i photo.tmp.jpg --tags-from photo.tif -o photo.jpg
+rm photo.tmp.jpg
+```
+
+The ICC color profile is always taken from the input, since it describes the converted pixels. Orientation is taken from the original, so this assumes the converter didn't rotate the pixels (e.g. ImageMagick's `-auto-orient`).
 
 ## Implementation
 

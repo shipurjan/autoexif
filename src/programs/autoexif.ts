@@ -5,6 +5,11 @@ import { access, copyFile, unlink } from "node:fs/promises";
 interface IOptions {
   input: string;
   output?: string;
+  /**
+   * Read metadata from this file instead of the input, e.g. the original an
+   * image was converted or resized from. Pixel data still comes from input.
+   */
+  tagsFrom?: string;
   /** Keep capture date/time tags (disable with --no-date) */
   date: boolean;
   /** Keep authorship and copyright tags (disable with --no-copyright) */
@@ -53,7 +58,6 @@ const TECHNICAL_TAGS = [
   "EXIF:Saturation",
   "EXIF:Sharpness",
   "EXIF:CustomRendered",
-  "ICC_Profile", // without it, wide-gamut images (Display P3, Adobe RGB) render with wrong colors
 
   // Scene
   "EXIF:SceneCaptureType",
@@ -67,6 +71,14 @@ const TECHNICAL_TAGS = [
   "EXIF:YResolution",
   "EXIF:ResolutionUnit",
 ] as const;
+
+/**
+ * Tags that describe the pixel data itself, so they're always copied from the
+ * input file, even with --tags-from: a converted image may have a different
+ * color profile than its original. Without the ICC profile, wide-gamut images
+ * (Display P3, Adobe RGB) render with wrong colors.
+ */
+const PIXEL_TAGS = ["ICC_Profile"] as const;
 
 const DATE_TAGS = [
   "EXIF:DateTimeOriginal",
@@ -123,11 +135,16 @@ const IGNORED_WARNINGS = [
 export async function autoexif({
   input,
   output,
+  tagsFrom,
   date,
   copyright,
 }: IOptions): Promise<void> {
   try {
-    const { inputPath, outputPath } = await validatePaths(input, output);
+    const { inputPath, outputPath, tagsFromPath } = await validatePaths(
+      input,
+      output,
+      tagsFrom,
+    );
     const tags = [
       ...TECHNICAL_TAGS,
       ...(date ? DATE_TAGS : []),
@@ -145,9 +162,13 @@ export async function autoexif({
             "-overwrite_original",
             "-all=",
             ...IFD0_TAGS_TO_DELETE.map((tag) => `-IFD0:${tag}=`),
+            // "@" means the file being written, i.e. the copy of the input
+            "-tagsFromFile",
+            tagsFromPath ?? "@",
+            ...tags.map((tag) => `-${tag}`),
             "-tagsFromFile",
             "@",
-            ...tags.map((tag) => `-${tag}`),
+            ...PIXEL_TAGS.map((tag) => `-${tag}`),
             "-XMP-x:XMPToolkit=",
           ],
         },
@@ -168,15 +189,18 @@ export async function autoexif({
 }
 
 /**
- * Validates input path and generates appropriate output path
+ * Validates input paths and generates appropriate output path
  */
 async function validatePaths(
   input: string,
   output?: string,
-): Promise<{ inputPath: string; outputPath: string }> {
+  tagsFrom?: string,
+): Promise<{ inputPath: string; outputPath: string; tagsFromPath?: string }> {
   const inputPath = resolve(input);
+  const tagsFromPath = tagsFrom ? resolve(tagsFrom) : undefined;
 
   await access(inputPath);
+  if (tagsFromPath) await access(tagsFromPath);
 
   const outputPath = output
     ? resolve(output)
@@ -191,5 +215,12 @@ async function validatePaths(
     );
   }
 
-  return { inputPath, outputPath };
+  // The output is created before tags are read, so this would destroy them
+  if (tagsFromPath === outputPath) {
+    throw new Error(
+      "Error: Output path cannot be the same as --tags-from, as it would be overwritten before its metadata is read.",
+    );
+  }
+
+  return { inputPath, outputPath, tagsFromPath };
 }
